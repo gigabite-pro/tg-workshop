@@ -1,3 +1,30 @@
+let words = wordList
+let usedWords = []
+
+if(localStorage.getItem('words') != null){
+    words = JSON.parse(localStorage.getItem('words'))
+}
+
+if(localStorage.getItem('usedWords') != null){
+    usedWords = JSON.parse(localStorage.getItem('usedWords'))
+}
+
+if(words.length == 1){
+    words = words.concat(usedWords)
+    usedWords = []
+}
+
+let random = Math.floor(Math.random() * words.length) // 0-1
+usedWords.push(words[random])
+const correctWord = words[random];
+const index = words.indexOf(words[random]);
+if (index > -1) {
+    words.splice(index, 1);
+}
+
+localStorage.setItem('words', JSON.stringify(words));
+localStorage.setItem('usedWords', JSON.stringify(usedWords));
+
 let keypad = document.getElementById('keypad');
 let qwerty = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -17,7 +44,6 @@ qwerty.forEach(r => {
     keypad.innerHTML += '<br><br>'
 })
 
-let correctWord = 'party';
 let attempt = 1;
 let currentLetter = 1;
 let currentInputId = attempt.toString() + currentLetter.toString() // '1' + '1' = '11' // '12'
@@ -67,6 +93,24 @@ window.addEventListener('keydown', (e) => {
             let letter4 = document.getElementById(attempt.toString() + '4')
             let letter5 = document.getElementById(attempt.toString() + '5')
             let word = letter1.value + letter2.value + letter3.value + letter4.value + letter5.value
+            if(words.includes(word.toLowerCase()) == false && usedWords.includes(word.toLowerCase()) == false){
+                setTimeout(() => {
+                    Toastify({
+                        text: "Word not in list",
+                        duration: 3000,
+                        destination: "https://github.com/apvarun/toastify-js",
+                        newWindow: true,
+                        close: false,
+                        gravity: "top", // `top` or `bottom`
+                        position: "center", // `left`, `center` or `right`
+                        stopOnFocus: false, // Prevents dismissing of toast on hover
+                        style: {
+                          background: "#b59f3b",
+                        }
+                      }).showToast();
+                }, 100)
+                return // breaks the function
+            }
             if (word == correctWord.toUpperCase()) { // check if the word is correct
                 let letters = [1,2,3,4,5]
                 letters.forEach(i => { // i = 1,2,3,4,5
